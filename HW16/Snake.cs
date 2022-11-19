@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ public class Snake
     public bool IsAlive { get; set; } = true;
     public Snake(Position location, int size = 1)
     {
-        WholeBody = new List<Position> {location};
+        WholeBody = new List<Position> { location };
         GrowthRemaining = Math.Max(0, size - 1);
     }
     public void Move(Direction direction)
@@ -29,30 +30,45 @@ public class Snake
             Direction.Right => Head.RightBy(1),
             _ => throw new Exception(""),
         };
-        if(WholeBody.Contains(newHead) || !IsPositionValid(newHead))
+        if (WholeBody.Contains(newHead) || !IsPositionValid(newHead))
         {
             IsAlive = false;
             return;
         }
         WholeBody.Insert(0, newHead);
         if (GrowthRemaining > 0) GrowthRemaining--;
-        else WholeBody.RemoveAt(WholeBody.Count -1);
+        else WholeBody.RemoveAt(WholeBody.Count - 1);
     }
     public void Grow()
     {
         if (!IsAlive) throw new Exception("");
         GrowthRemaining++;
     }
-    public void Render()
+  
+    public bool IsPositionValid(Position pos) =>
+        pos.Top >= 0 && pos.Left >= 0;
+   
+}
+public static class SnakeExtensions
+{
+    public static void Render(this Snake snake, Game game)
     {
-        Console.SetCursorPosition(Head.Left, Head.Top);
+        game.RotateShakeIfBouns();
+        Console.SetCursorPosition(snake.Head.Left, snake.Head.Top);
         Console.WriteLine("○");
-        foreach (var elem in Body)
+        foreach (var elem in snake.Body)
         {
             Console.SetCursorPosition(elem.Left, elem.Top);
             Console.WriteLine("●");
         }
     }
-    public bool IsPositionValid(Position pos) =>
-        pos.Top >= 0 && pos.Left >= 0;
+
 }
+
+
+
+
+
+
+
+
