@@ -14,11 +14,11 @@ public class Apple
     {
         Position = position;
     }
-    public void Render()
-    {
-        Console.SetCursorPosition(Position.Left, Position.Top);
-        Console.WriteLine("Δ");
-    }
+    //public void Render()
+    //{
+    //    Console.SetCursorPosition(Position.Left, Position.Top);
+    //    Console.WriteLine("Δ");
+    //}
 }
 
 public static class AppleExtentions
@@ -29,9 +29,20 @@ public static class AppleExtentions
         var colums = 20;
         var random = new Random();
         var top = random.Next(0, rows + 2);
-        var left = random.Next(0,colums + 2);
+        var left = random.Next(0, colums + 2);
         return new Apple(new Position(top, left));
     }
+    public static void Render(this Apple apple)
+    {
+        Console.SetCursorPosition(apple.Position.Left, apple.Position.Top);
+        Console.WriteLine("Δ");
+    }
+
+
+
 }
+
+
+
 
 
