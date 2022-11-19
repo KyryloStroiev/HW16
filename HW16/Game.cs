@@ -11,22 +11,24 @@ public class Game
     public Position StartPosition = new(8, 8);
     public Direction CurrentDirection;
     public Direction NextDirection;
+    
 
     public Snake _snake;
     public Apple _apple;
     public Block _block;
+    public int _rate = 120;
 
     public Game()
     {
-        _snake = new Snake(StartPosition, 2);
+        _snake = new Snake(StartPosition, 5);
         _apple = AppleExtentions.CreatApple();
         _block = BlockExtention.CreatBlock();
-        CurrentDirection = Direction.Down;
-        NextDirection = Direction.Down;
+        CurrentDirection = Direction.Right;
+        NextDirection = Direction.Right;
     }
 
     public bool IsGameOver => !_snake.IsAlive;
-    public void  OnKeyPress (ConsoleKey key)
+    public void OnKeyPress(ConsoleKey key)
     {
         Direction newDirection;
         switch (key)
@@ -45,42 +47,36 @@ public class Game
                 break;
             default: return;
         }
-        if (newDirection == OppositeDirection(CurrentDirection))
-        return;
+        if (newDirection == CurrentDirection.OppositeDirection())
+            return;
         NextDirection = newDirection;
-        
+
     }
-    public  Direction OppositeDirection(Direction direction) =>
-     direction switch
-        {
-            Direction.Up => Direction.Down,
-            Direction.Down => Direction.Up,
-            Direction.Left => Direction.Right,
-            Direction.Right => Direction.Left,
-            _ => throw new Exception()
-        };
+   
     public void Render()
     {
         Console.Clear();
-        _snake.Render();
+        _snake.Render(this);
         _apple.Render();
         _block.Render();
         Console.SetCursorPosition(0, 0);
     }
     public void OnTick()
     {
-        if(IsGameOver) throw new Exception();
+        if (IsGameOver) throw new Exception();
         CurrentDirection = NextDirection;
         _snake.Move(CurrentDirection);
-        if(_snake.Head.Equals(_apple.Position))
+        if (_snake.Head.Equals(_apple.Position))
         {
             _snake.Grow();
+            
+            _rate = _rate > 10 ? _rate - 10 : _rate;
             _apple = AppleExtentions.CreatApple();
             do
             {
-             _block = BlockExtention.CreatBlock();
-            }while(IsGameOver);
-            
+                _block = BlockExtention.CreatBlock();
+            } while (IsGameOver);
+
         }
         if (_snake.Head.Equals(_block.Position))
         {
@@ -88,5 +84,15 @@ public class Game
                 " Дя продовження нажмiть Enter");
             Console.ReadKey();
         }
+    }
+    
+}
+public static class GameExtension
+{
+    public static void RotateShakeIfBouns(this Game game)
+    {
+        if (game._snake.Head.Left == Console.WindowWidth - 6 || game._snake.Head.Left == 0 ||
+                game._snake.Head.Top == Console.WindowWidth - 6 || game._snake.Head.Top == 0)
+            game.NextDirection = game.CurrentDirection.OppositeDirection();
     }
 }
